@@ -1,40 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-## Getting Started
+This repo is meant to demonstrate a memory leak in RTKQ 1.9.6
 
-First, run the development server:
+- http://localhost:9090 -> Prometheus UI
+- http://localhost:19191 -> Thanos Sidecar
+- http://localhost:3001 -> Grafana Dashboard
+- http://localhost:3000 -> Next.js
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+To start, run `docker compose up`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The Next.js project should build. It runs a single page that renders the name of a pokemon. Verify you can see the page by accessing `http://localhost:3000/?name=bulbasaur&keyA=A&keyB=B`. The `keyA` and `keyB` query params serve only to fragment the RTKQ query cache.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+There is a dashboard 'NodeJS Application dashboard' viewable in Grafana that shows the characteristic curve of the memory leak. Log into Grafana with admin/admin (you can skip resetting the master password). Prometheus will scrape metrics from http://localhost:3000/api/prometheus every 5 seconds. The dashboard should be visible at http://localhost:3001/d/PTSqcpJWks/nodejs-application-dashboards
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+Simulate load by running `node load.js`. This will make a request to the Next.js site every second. This will result in a memory leak which will be visible on the dashboard.
