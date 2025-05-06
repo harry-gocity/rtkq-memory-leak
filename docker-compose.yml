@@ -54,6 +54,7 @@ services:
       - monitoring
     environment:
       - NODE_ENV=production
+      - NODE_OPTIONS=--max-old-space-size=256 # Intentionally low to trigger GC
     depends_on:
       - prometheus
 
